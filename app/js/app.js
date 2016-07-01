@@ -16,19 +16,21 @@ var NBJS = NBJS || {};
 
 		var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );	
 		for (var i = 0; i < 10; i++) {
-			var geometry = new THREE.SphereGeometry(1, 10, 10);
-			var body = new THREE.Mesh(geometry, material);
+			var body = new Body();
+			body.setCoord(new THREE.Vector3(-10 + Math.random()*20, 
+				-10 + Math.random()*20, -10 + Math.random()*20));
 			bodies.push(body);
-			scene.add(body);
-			body.position.set(-10 + Math.random()*20, 
-				-10 + Math.random()*20, -10 + Math.random()*20);
+			scene.add(body.makeSphereMesh(1, 10, material));			
 		}			
 		
 		camera.position.z = 15;
 
-	   	var light = new THREE.DirectionalLight(0xffffff, 1);
-		light.position.set(100, 100, 50);
-    	scene.add(light);
+		var ambLight = new THREE.AmbientLight(0x222222);
+		scene.add(ambLight);
+
+	   	var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+		dirLight.position.set(100, 100, 50);
+    	scene.add(dirLight);
 
     	controls = new THREE.OrbitControls(camera, renderer.domElement);				
 		controls.target = new THREE.Vector3(0, 0, 0);
@@ -41,7 +43,8 @@ var NBJS = NBJS || {};
 		bodies.forEach(function(body) {
 			var shift = new THREE.Vector3(-0.1 + Math.random()*0.2, 
 				-0.1 + Math.random()*0.2, -0.1 + Math.random()*0.2);
-			body.position.add(shift);
+			var newPos = new THREE.Vector3().addVectors(body.coord, shift);			
+			body.setCoord(newPos);
 		});
 
 		renderer.render(scene, camera);
