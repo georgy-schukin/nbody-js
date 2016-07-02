@@ -15,3 +15,5 @@ function lerpRadiusByMass(minRadius, maxRadius, mass, minMass, maxMass) {
 	var t = (mass - minMass)/(maxMass - minMass);
 	return minRadius*(1 - t) + (maxRadius - minRadius)*t;
 }
+
+

@@ -3,7 +3,7 @@
 function Body() {
 	this.coord = new THREE.Vector3(0, 0, 0);
 	this.velocity = new THREE.Vector3(0, 0, 0);		
-	this.force = new THREE.Vector3(0, 0, 0);
+	this.acceleration = new THREE.Vector3(0, 0, 0);
 	this.mass = 0.0;
 	this.mesh = null;	
 }
@@ -36,51 +36,48 @@ Body.prototype.setRandomMass = function (min, max) {
 	return this.setMass(getRandomInRange(min, max));
 }
 
-Body.prototype.computeForce = function (otherBody) {
+Body.prototype.computeAcceleration = function (otherBody) {
 	var G = 6.673e-11;
     var dx = otherBody.coord.x - this.coord.x;
     var dy = otherBody.coord.y - this.coord.y;
     var dz = otherBody.coord.z - this.coord.z;    
     var dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 1e-12; // avoid zero distance
-    var temp = G*otherBody.mass*this.mass/(dist*dist*dist);
+    var temp = G*otherBody.mass/(dist*dist*dist); 
 	return new THREE.Vector3(temp*dx, temp*dy, temp*dz);
 }
 
-Body.prototype.resetForce = function () {
-	this.force.set(0, 0, 0);
+Body.prototype.addAccountFrom = function (otherBody) {
+	return this.addAcceleration(this.computeAcceleration(otherBody));
+}
+
+Body.prototype.addAcceleration = function (acceleration) {
+	this.acceleration.add(acceleration);
 	return this;
 }
 
-Body.prototype.addForce = function (force) {
-	this.force.add(force);
+Body.prototype.resetAcceleration = function () {
+	this.acceleration.set(0, 0, 0);
+	return this;
+}
+
+Body.prototype.prepareForUpdate = function () {
+	return this.resetAcceleration();
+}
+
+Body.prototype.update = function (delta) {
+	var temp = this.acceleration.clone().multiplyScalar(delta); // a*t
+	var coordShift = this.velocity.clone().multiplyScalar(delta).
+		add(temp.clone().multiplyScalar(delta*0.5)); // v0*t + a*t*t/2	
+	this.coord.add(coordShift);	// r = r0 + v0*t + a*t*t/2   
+	this.velocity.add(temp); // v = v0 + a*t
+	this.updateMesh();
 	return this;
 }
 
 Body.prototype.setMesh = function (mesh) {
 	this.mesh = mesh;
-	return this;
-}
-
-Body.prototype.update = function (delta) {
-	var coordShift = this.velocity.clone().multiplyScalar(delta);
-	var velocityShift = this.force.clone().multiplyScalar(delta).divideScalar(this.mass);
-	this.coord.add(coordShift);	   
-	this.velocity.add(velocityShift); 
-	this.updateMesh();
-	return this;
-}
-
-Body.prototype.makeMesh = function (geom, mat) {
-	this.mesh = new THREE.Mesh(geom, mat);	
-	this.updateMesh();
-	return this.mesh;
-}
-
-Body.prototype.makeSphereMesh = function (radius, segments, mat) {
-	var sphereGeom = new THREE.SphereGeometry(radius, segments, segments);
-	this.mesh = new THREE.Mesh(sphereGeom, mat);
 	this.updateMesh();	
-	return this.mesh;
+	return this;
 }
 
 Body.prototype.updateMesh = function () {
