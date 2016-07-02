@@ -56,6 +56,11 @@ Body.prototype.addForce = function (force) {
 	return this;
 }
 
+Body.prototype.setMesh = function (mesh) {
+	this.mesh = mesh;
+	return this;
+}
+
 Body.prototype.update = function (delta) {
 	var coordShift = this.velocity.clone().multiplyScalar(delta);
 	var velocityShift = this.force.clone().multiplyScalar(delta).divideScalar(this.mass);
@@ -82,5 +87,19 @@ Body.prototype.updateMesh = function () {
 	if (this.mesh !== null) {
 		this.mesh.position.copy(this.coord);
 	}
+}
+
+Body.prototype.addToScene = function (scene) {
+	if (this.mesh !== null) {
+		scene.add(this.mesh);
+	}
+	return this;
+}
+
+Body.prototype.removeFromScene = function (scene) {
+	if (this.mesh !== null) {
+		scene.remove(this.mesh);
+	}
+	return this;
 }
 

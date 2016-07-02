@@ -10,3 +10,8 @@ function getRandomVector(min, max) {
 	var z = getRandomInRange(min, max);
 	return new THREE.Vector3(x, y, z);
 }
+
+function lerpRadiusByMass(minRadius, maxRadius, mass, minMass, maxMass) {
+	var t = (mass - minMass)/(maxMass - minMass);
+	return minRadius*(1 - t) + (maxRadius - minRadius)*t;
+}

@@ -3,7 +3,7 @@
 var NBJS = NBJS || {};
 
 (function(nbjs) {
-	var scene, camera, renderer, controls;	
+	var scene, camera, renderer, controls;		
 	var bodies = [];	
 
 	function initLights() {
@@ -21,6 +21,16 @@ var NBJS = NBJS || {};
 		controls.enableZoom = true;
 	}	
 
+	function initSkyBox() {
+		var boxGeometry = new THREE.BoxGeometry(1000, 1000, 1000);
+		var textureLoader = new THREE.TextureLoader();
+		var boxTex = textureLoader.load('../resources/images/space.png'); 
+		var boxMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, 
+			side: THREE.BackSide, map: boxTex} );		
+		var skyBox = new THREE.Mesh(boxGeometry, boxMaterial);
+		scene.add(skyBox);
+	}
+
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
@@ -30,7 +40,7 @@ var NBJS = NBJS || {};
 	var init = function () {	
 		scene = new THREE.Scene();
 
-		camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+		camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
 		camera.position.z = 15;
 
 		renderer = new THREE.WebGLRenderer();
@@ -39,25 +49,31 @@ var NBJS = NBJS || {};
 
 		initLights();
 		initControls();    			
+		initSkyBox();
 
 		window.addEventListener('resize', onWindowResize, false);
 	}
 
 	function generateBodies(numOfBodies) {
-		var material = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
+		var bodyMaterial = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
+		var minMass = 1000;
+		var maxMass = 100000;
 		for (var i = 0; i < numOfBodies; i++) {
 			var body = new Body();
 			body.setRandomCoord(-10, 10);
 			body.setRandomVelocity(-1, 1);
-			body.setRandomMass(1000, 10000);
+			body.setRandomMass(minMass, maxMass);			
+			var meshRadius = lerpRadiusByMass(0.1, 1, body.mass, minMass, maxMass);
+			var bodyMesh = body.makeSphereMesh(meshRadius, 10, bodyMaterial);
+			body.setMesh(bodyMesh);
+			body.addToScene(scene);			
 			bodies.push(body);
-			scene.add(body.makeSphereMesh(1, 10, material));			
 		}			
 	}
 
 	function clearBodies() {
 		bodies.forEach( function (body) {
-			scene.remove(body.mesh);
+			body.removeFromScene(scene);
 		})
 		bodies.splice(0, bodies.length);
 	}
