@@ -11,15 +11,19 @@
 	<script type="text/javascript" src="js/body.js"></script>	
 	<script type="text/javascript" src="js/app.js"></script>	
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$("#controls").submit(function(event) {
+		$(document).ready( function() {
+			$("#controls").submit( function (event) {
 				event.preventDefault();
-				var numOfBodies = $(this).find("input[name=numOfBodies]").val();
-				NBJS.start(numOfBodies);							
+				var numOfBodies = $("#numOfBodies").val();				
+				NBJS.start(numOfBodies);				
 				return false;
+			});
+			$("#skybox").change( function (event) {
+				NBJS.toggleSkyBox($(this).prop("checked"));
 			});
 			NBJS.init();
 			NBJS.render();			
+			NBJS.toggleSkyBox($("#skybox").prop("checked"));
 		});
 	</script>
 </head>
@@ -27,7 +31,9 @@
 <div id="controls-pane">
 	<form id="controls">
 		<label>Number of bodies:</label><br>
-		<input name="numOfBodies" type="number" min="1" max="1000" value="10"><br>
+		<input type="number" name="numOfBodies" id="numOfBodies" min="1" max="1000" value="10"><br>
+		<label>Show skybox:</label>		
+		<input type="checkbox" name="skybox" id="skybox" checked><br>		
 		<input type="submit" value="Start">
 	</form>
 </div>

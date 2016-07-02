@@ -4,6 +4,7 @@ var NBJS = NBJS || {};
 
 (function(nbjs) {
 	var scene, camera, renderer, controls;		
+	var skyBox = null;
 	var bodies = [];	
 
 	function initLights() {
@@ -27,8 +28,18 @@ var NBJS = NBJS || {};
 		var boxTex = textureLoader.load('../resources/images/space.png'); 
 		var boxMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, 
 			side: THREE.BackSide, map: boxTex} );		
-		var skyBox = new THREE.Mesh(boxGeometry, boxMaterial);
+		skyBox = new THREE.Mesh(boxGeometry, boxMaterial);
 		scene.add(skyBox);
+	}
+
+	function toggleSkyBox(boxOn) {
+		if (skyBox !== null) {
+			if (boxOn) {
+				scene.add(skyBox);
+			} else {
+				scene.remove(skyBox);
+			}
+		}
 	}
 
 	function onWindowResize() {
@@ -37,7 +48,7 @@ var NBJS = NBJS || {};
 		renderer.setSize(window.innerWidth, window.innerHeight);
 	}
 	
-	var init = function () {	
+	function init() {	
 		scene = new THREE.Scene();
 
 		camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
@@ -98,7 +109,7 @@ var NBJS = NBJS || {};
 		});		
 	}
 
-	var render = function () {
+	function render() {
 		requestAnimationFrame(render);				
 		renderer.render(scene, camera);
 	 	controls.update();
@@ -121,7 +132,7 @@ var NBJS = NBJS || {};
 		}
 	}
 
-	var startSimulation = function (numOfBodies) {
+	function startSimulation(numOfBodies) {
 		stopCompute();
 		initBodies(numOfBodies);
 		startCompute();
@@ -130,4 +141,5 @@ var NBJS = NBJS || {};
 	nbjs.init = init;	
 	nbjs.render = render;
 	nbjs.start = startSimulation;
+	nbjs.toggleSkyBox = toggleSkyBox;
 })(NBJS);
