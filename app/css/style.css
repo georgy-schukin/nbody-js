@@ -15,11 +15,11 @@ canvas  {
 	font-family: Verdana, Geneva, sans-serif;
 }
 
-#controls label {
+#controls-pane label {
 	font-size: 0.9em;
 }
 
-#controls input {
+#controls-pane input {
 	background-color: transparent;
 	border-width: 1px;	
 	color: #fff;

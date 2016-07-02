@@ -99,15 +99,35 @@ var NBJS = NBJS || {};
 	}
 
 	var render = function () {
-		requestAnimationFrame(render);		
-
-		updateBodies(0.1);
-
+		requestAnimationFrame(render);				
 		renderer.render(scene, camera);
 	 	controls.update();
 	};		
 
-	nbjs.init = init;
-	nbjs.initBodies = initBodies;
+	var computeId = null;
+
+	function compute() {
+		updateBodies(0.1);
+		computeId = setTimeout(compute, 10);
+	}	
+
+	function startCompute() {
+		computeId = setTimeout(compute, 0);
+	}
+
+	function stopCompute() {
+		if (computeId !== null) {
+			clearTimeout(computeId);
+		}
+	}
+
+	var startSimulation = function (numOfBodies) {
+		stopCompute();
+		initBodies(numOfBodies);
+		startCompute();
+	}
+
+	nbjs.init = init;	
 	nbjs.render = render;
+	nbjs.start = startSimulation;
 })(NBJS);

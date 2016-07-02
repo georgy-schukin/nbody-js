@@ -15,11 +15,11 @@
 			$("#controls").submit(function(event) {
 				event.preventDefault();
 				var numOfBodies = $(this).find("input[name=numOfBodies]").val();
-				NBJS.initBodies(numOfBodies);			
+				NBJS.start(numOfBodies);							
 				return false;
 			});
 			NBJS.init();
-			NBJS.render();
+			NBJS.render();			
 		});
 	</script>
 </head>
