@@ -19,19 +19,7 @@ var NBJS = NBJS || {};
 		controls = new THREE.OrbitControls(camera, renderer.domElement);				
 		controls.target = new THREE.Vector3(0, 0, 0);
 		controls.enableZoom = true;
-	}
-
-	function generateBodies(numOfBodies) {
-		var material = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
-		for (var i = 0; i < numOfBodies; i++) {
-			var body = new Body();
-			body.setRandomCoord(-10, 10);
-			body.setRandomVelocity(-1, 1);
-			body.setRandomMass(0.1, 1000);
-			bodies.push(body);
-			scene.add(body.makeSphereMesh(1, 10, material));			
-		}			
-	}
+	}	
 
 	function onWindowResize() {
 		camera.aspect = window.innerWidth / window.innerHeight;
@@ -41,31 +29,54 @@ var NBJS = NBJS || {};
 	
 	var init = function () {	
 		scene = new THREE.Scene();
-		camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-		renderer = new THREE.WebGLRenderer();
 
-		renderer.setSize(window.innerWidth, window.innerHeight);
-		document.body.appendChild(renderer.domElement);		
-		
+		camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 		camera.position.z = 15;
 
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);						
+
 		initLights();
-		initControls();    	
-		generateBodies(50);
+		initControls();    			
 
 		window.addEventListener('resize', onWindowResize, false);
 	}
 
+	function generateBodies(numOfBodies) {
+		var material = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
+		for (var i = 0; i < numOfBodies; i++) {
+			var body = new Body();
+			body.setRandomCoord(-10, 10);
+			body.setRandomVelocity(-1, 1);
+			body.setRandomMass(1000, 10000);
+			bodies.push(body);
+			scene.add(body.makeSphereMesh(1, 10, material));			
+		}			
+	}
+
+	function clearBodies() {
+		bodies.forEach( function (body) {
+			scene.remove(body.mesh);
+		})
+		bodies.splice(0, bodies.length);
+	}
+
+	function initBodies(numOfBodies) {
+		clearBodies();
+		generateBodies(numOfBodies);
+	}
+
 	function updateBodies(delta) {		
-		bodies.forEach(function (body) {
+		bodies.forEach( function (body) {
 			body.resetForce();
-			bodies.forEach(function (otherBody) {
+			bodies.forEach( function (otherBody) {
 				if (body !== otherBody) {
 					body.addForce(body.computeForce(otherBody));
 				}
 			});
 		});
-		bodies.forEach(function (body) {
+		bodies.forEach( function (body) {
 			body.update(delta);
 		});		
 	}
@@ -80,5 +91,6 @@ var NBJS = NBJS || {};
 	};		
 
 	nbjs.init = init;
+	nbjs.initBodies = initBodies;
 	nbjs.render = render;
 })(NBJS);
