@@ -27,6 +27,10 @@ canvas  {
 	margin: 5px 5px;	
 }
 
-#controls-pane input[type=submit] {
+#controls-pane input[type=button] {
 	width: 10em;
+}
+
+#controls-pane input[type=button]:disabled {
+	color: #666;
 }

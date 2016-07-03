@@ -141,5 +141,7 @@ var NBJS = NBJS || {};
 	nbjs.init = init;	
 	nbjs.render = render;
 	nbjs.start = startSimulation;
+	nbjs.pause = stopCompute;
+	nbjs.resume = startCompute;
 	nbjs.toggleSkyBox = toggleSkyBox;
 })(NBJS);
