@@ -70,7 +70,7 @@ var NBJS = NBJS || {};
 		var minMass = 1000;
 		var maxMass = 100000;
 		for (var i = 0; i < numOfBodies; i++) {
-			var body = new Body();
+			var body = new Body.Body();
 			body.setRandomCoord(-10, 10);
 			body.setRandomVelocity(-0.5, 0.5);
 			body.setRandomMass(minMass, maxMass);			

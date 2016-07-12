@@ -1,8 +1,18 @@
-"use strict";
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define([], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        // Node. Does not work with strict CommonJS, but
+        // only CommonJS-like environments that support module.exports,
+        // like Node.
+        module.exports = factory();
+    } else {
+        // Browser globals (root is window)
+        root.Util = factory();
+	}
+} (this, function () {
 
-var Util = Util || {};
-
-(function (util) {
 	function getRandomInRange(min, max) {
 		return Math.random() * (max - min) + min;
 	}
@@ -25,10 +35,12 @@ var Util = Util || {};
 		dest[2] += source[2];	
 	}
 
-	util.getRandomInRange = getRandomInRange;
-	util.getRandomVector = getRandomVector;
-	util.lerpRadiusByMass = lerpRadiusByMass;
-	util.addVectors = addVectors;
-})(Util);
+	return {
+		getRandomInRange: getRandomInRange,
+		getRandomVector: getRandomVector,
+		lerpRadiusByMass: lerpRadiusByMass,
+		addVectors: addVectors
+	}
+}));
 
 
