@@ -74,18 +74,19 @@ var NBJS = NBJS || {};
 			body.setRandomCoord(-10, 10);
 			body.setRandomVelocity(-0.5, 0.5);
 			body.setRandomMass(minMass, maxMass);			
-			var meshRadius = lerpRadiusByMass(0.1, 1, body.mass, minMass, maxMass);
+			var meshRadius = Util.lerpRadiusByMass(0.1, 1, body.mass, minMass, maxMass);
 			var bodyGeometry = new THREE.SphereGeometry(meshRadius, 10, 10);	
 			var bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
-			body.setMesh(bodyMesh);
-			body.addToScene(scene);			
+			body.mesh = bodyMesh; // attach mesh to body
+			updateBodyMesh(body.mesh, body);
+			scene.add(body.mesh);			
 			bodies.push(body);
 		}			
 	}
 
 	function clearBodies() {
 		bodies.forEach( function (body) {
-			body.removeFromScene(scene);
+			scene.remove(body.mesh);			
 		})
 		bodies.splice(0, bodies.length);
 	}
@@ -93,7 +94,7 @@ var NBJS = NBJS || {};
 	function initBodies(numOfBodies) {
 		clearBodies();
 		generateBodies(numOfBodies);
-	}
+	}	
 
 	function updateBodies(delta) {		
 		bodies.forEach( function (body) {
@@ -106,7 +107,12 @@ var NBJS = NBJS || {};
 		});
 		bodies.forEach( function (body) {
 			body.update(delta);
-		});		
+			updateBodyMesh(body.mesh, body);
+		});				
+	}
+
+	function updateBodyMesh(mesh, body) {
+		mesh.position.set(body.coord[0], body.coord[1], body.coord[2]); // update body mesh
 	}
 
 	function render() {
