@@ -65,48 +65,42 @@ var NBJS = NBJS || {};
 		window.addEventListener('resize', onWindowResize, false);
 	}
 
-	function generateBodies(numOfBodies) {
-		var bodyMaterial = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
-		var minMass = 1000;
-		var maxMass = 100000;
-		for (var i = 0; i < numOfBodies; i++) {
-			var body = new Body.Body();
-			body.setRandomCoord(-10, 10);
-			body.setRandomVelocity(-0.5, 0.5);
-			body.setRandomMass(minMass, maxMass);			
-			var meshRadius = Util.lerpRadiusByMass(0.1, 1, body.mass, minMass, maxMass);
-			var bodyGeometry = new THREE.SphereGeometry(meshRadius, 10, 10);	
-			var bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
-			body.mesh = bodyMesh; // attach mesh to body
-			updateBodyMesh(body.mesh, body);
-			scene.add(body.mesh);			
-			bodies.push(body);
-		}			
-	}
-
-	function clearBodies() {
-		bodies.forEach( function (body) {
-			scene.remove(body.mesh);			
-		})
-		bodies.splice(0, bodies.length);
-	}
-
 	function initBodies(numOfBodies) {
 		clearBodies();
 		generateBodies(numOfBodies);
 	}	
 
+	function generateBodies(numOfBodies) {
+		var minMass = 1000;
+		var maxMass = 100000;
+		bodies = Body.generateRandomBodies(numOfBodies, minMass, maxMass);
+		initBodyMeshes(minMass, maxMass);		
+	}		
+
 	function updateBodies(delta) {		
+		Body.updateBodies(bodies, delta);
+		updateBodyMeshes();
+	}
+
+	function clearBodies() {
+		clearBodyMeshes();
+		bodies.splice(0, bodies.length);
+	}
+
+	function initBodyMeshes(minMass, maxMass) {
+		var bodyMaterial = new THREE.MeshPhongMaterial( { color: 0xffaa00 } );	
 		bodies.forEach( function (body) {
-			body.prepareForUpdate();
-			bodies.forEach( function (otherBody) {
-				if (body !== otherBody) {
-					body.addAccountFrom(otherBody);
-				}
-			});
-		});
-		bodies.forEach( function (body) {
-			body.update(delta);
+			var meshRadius = Util.lerpRadiusByMass(0.1, 1, body.mass, minMass, maxMass);
+			var bodyGeometry = new THREE.SphereGeometry(meshRadius, 10, 10);	
+			var bodyMesh = new THREE.Mesh(bodyGeometry, bodyMaterial);
+			body.mesh = bodyMesh; // attach mesh to body
+			updateBodyMesh(body.mesh, body);
+			scene.add(body.mesh);
+		});				
+	}
+
+	function updateBodyMeshes() {
+		bodies.forEach( function (body) {			
 			updateBodyMesh(body.mesh, body);
 		});				
 	}
@@ -115,6 +109,12 @@ var NBJS = NBJS || {};
 		mesh.position.set(body.coord[0], body.coord[1], body.coord[2]); // update body mesh
 	}
 
+	function clearBodyMeshes() {
+		bodies.forEach( function (body) {
+			scene.remove(body.mesh);			
+		});
+	}
+	
 	function render() {
 		requestAnimationFrame(render);				
 		renderer.render(scene, camera);

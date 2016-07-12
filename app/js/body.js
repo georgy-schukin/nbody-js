@@ -91,7 +91,35 @@
 		return this;
 	}
 
+	function generateRandomBodies(numOfBodies, minMass, maxMass) {
+		var bodies = [];		
+		for (var i = 0; i < numOfBodies; i++) {
+			var body = new Body();
+			body.setRandomCoord(-10, 10);
+			body.setRandomVelocity(-0.5, 0.5);
+			body.setRandomMass(minMass, maxMass);						
+			bodies.push(body);
+		}			
+		return bodies;
+	}
+
+	function updateBodies(bodies, delta) {		
+		bodies.forEach( function (body) {
+			body.prepareForUpdate();
+			bodies.forEach( function (otherBody) {
+				if (body !== otherBody) {
+					body.addAccountFrom(otherBody);
+				}
+			});
+		});
+		bodies.forEach( function (body) {
+			body.update(delta);			
+		});				
+	}
+
 	return {
-		Body: Body
+		Body: Body,
+		generateRandomBodies: generateRandomBodies,
+		updateBodies: updateBodies
 	}
 }));
